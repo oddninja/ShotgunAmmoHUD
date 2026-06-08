@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="$(MSBuildProjectDirectory)\dev\local.props" Condition="Exists('$(MSBuildProjectDirectory)\dev\local.props')" />
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <AssemblyName>ShotgunAmmoHUD</AssemblyName>
+    <Version>1.0.0</Version>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <RestoreAdditionalProjectSources>
+      https://api.nuget.org/v3/index.json;
+      https://nuget.bepinex.dev/v3/index.json
+    </RestoreAdditionalProjectSources>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- BepInEx -->
+    <PackageReference Include="BepInEx.Core" Version="5.*" PrivateAssets="all" />
+    <!-- Assemblies for the game -->
+    <PackageReference Include="LethalCompany.GameLibs.Steam" Version="*-*" PrivateAssets="all" />
+  </ItemGroup>
+
+  <Target Name="DeployPlugin" AfterTargets="Build" Condition="'$(DeployPluginDir)' != ''">
+    <MakeDir Directories="$(DeployPluginDir)\$(AssemblyName)" />
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(DeployPluginDir)\$(AssemblyName)" OverwriteReadOnlyFiles="true" />
+    <Copy SourceFiles="$(MSBuildProjectDirectory)\icon.png" DestinationFolder="$(DeployPluginDir)\$(AssemblyName)" OverwriteReadOnlyFiles="true" Condition="Exists('$(MSBuildProjectDirectory)\icon.png')" />
+    <Copy SourceFiles="$(MSBuildProjectDirectory)\manifest.json" DestinationFolder="$(DeployPluginDir)\$(AssemblyName)" OverwriteReadOnlyFiles="true" Condition="Exists('$(MSBuildProjectDirectory)\manifest.json')" />
+    <Message Importance="high" Text="$(AssemblyName): deployed DLL + icon to $(DeployPluginDir)\$(AssemblyName)" />
+  </Target>
+
+</Project>

@@ -1,0 +1,39 @@
+name: release
+
+on:
+  push:
+    tags: [ 'v*' ]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Build
+        run: dotnet build -c Release
+
+      - name: Assemble Thunderstore package
+        run: |
+          VER="${GITHUB_REF_NAME#v}"
+          MANIFEST_VER="$(jq -r .version_number manifest.json)"
+          if [ "$VER" != "$MANIFEST_VER" ]; then
+            echo "::error::Tag ($VER) does not match manifest.json version_number ($MANIFEST_VER)."
+            exit 1
+          fi
+          mkdir -p dist/pkg
+          cp manifest.json icon.png README.md dist/pkg/
+          cp bin/Release/ShotgunAmmoHUD.dll dist/pkg/
+          (cd dist/pkg && zip -r "../ShotgunAmmoHUD-${VER}.zip" .)
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/ShotgunAmmoHUD-*.zip
+          generate_release_notes: true
