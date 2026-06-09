@@ -1,6 +1,6 @@
 {
   "name": "ShotgunAmmoHUD",
-  "version_number": "1.0.0",
+  "version_number": "1.0.1",
   "website_url": "https://github.com/oddninja/ShotgunAmmoHUD",
   "description": "Adds a line showing how many shells are loaded in the shotgun you're holding",
   "dependencies": [
